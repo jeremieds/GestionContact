@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javax.naming.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import javax.sql.DataSource;
 
 import com.lip6.entities.Adress;
@@ -21,7 +22,7 @@ public class ContactDaos {
 	}
 
 
-/*
+	/*
 	public String createContact(String nom, String prenom, String mail, String street, String city, String zip,
 			String country, String type_number, String number) throws NamingException {
 
@@ -90,80 +91,70 @@ public class ContactDaos {
 		}
 
 	}
-	*/
-	
-	
+	 */
+
+
 	public String createContact(String nom, String prenom, String mail, String street, String city, String zip,
 			String country, String type_number, String number) throws NamingException {
-		
-			
-			//Avant l'utilisation de classe JpaUtil	
-			//EntityManagerFactory emf=Persistence.createEntityManagerFactory("projetJPA");
-			
-			//1: obtenir une connexion et un EntityManager, en passant par la classe JpaUtil
-			
-		    boolean success=false;
 
-			try {
-		    EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+		//Avant l'utilisation de classe JpaUtil	
+		//EntityManagerFactory emf=Persistence.createEntityManagerFactory("projetJPA");
+
+		//1: obtenir une connexion et un EntityManager, en passant par la classe JpaUtil
+
+		boolean success=false;
+
+		try {
+			EntityManager em=JpaUtil.getEmf().createEntityManager();
 
 			// 2 : Ouverture transaction 
 			EntityTransaction tx =  em.getTransaction();
 			tx.begin();
-			
+
 			// 3 : Instanciation Objet(s) m�tier (s)
 			Contact contact = new Contact(prenom,nom, mail);
 			Adress adress = new Adress(street, city, zip, country);
 			PhoneNumber phoneNumber1 = new PhoneNumber(type_number, number);
 
-			
+
 			phoneNumber1.setContact(contact);
-			
+
+
 			contact.getPhones().add(phoneNumber1);
-			
+
 			contact.setAdress(adress);
 			adress.setContact(contact);
-			
-			
-			
-			
-			
 
-			
-			
+
 			// 4 : Persistance Objet/Relationnel : cr�ation d'un enregistrement en base
-			 
+
 			em.persist(contact);
 			em.persist(adress);
 			em.persist(phoneNumber1);
 
-	
-			//ici l'objet est dans un �tat manag� par l'EM, pas besoin d'un nouveau persist
-			contact.setLastName("Blanquito");
-			
+
 			// 5 : Fermeture transaction 
 			tx.commit();
-			
-			//ici l'objet est dans un �tat d�tach� de l'EM, la modif ne sera pas commit�e
-			contact.setLastName("Blanchard");
-			 
+
+
 			// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
 			em.close();
-			
+
 			// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
 			//Donc, pense bien à ce qu'elle soit la dernière action de votre application
 			//JpaUtil.close();	
-			
+
 			success=true;
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				
-			}
-			return null;
-			
 		}
-	
+		catch (Exception e) {
+			e.printStackTrace();
+
+		}
+		return null;
+
+	}
+	/*
 	public String readContact(String mail) throws NamingException {
 		ResultSet rs = null;
 		String res, nom, prenom, street, city, zip, country, phone_kind, phone_number;
@@ -217,7 +208,63 @@ public class ContactDaos {
 		return null;
 
 	}
+	 */
+	public String readContact(String mail) throws NamingException {
 
+		boolean success=false;
+		String res, nom, prenom, street, city, zip, country, phone_kind, phone_number;
+
+		try {
+			EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+			// 2 : Ouverture transaction 
+			EntityTransaction tx =  em.getTransaction();
+			tx.begin();
+			//Contact contact = (Contact) em.createQuery("SELECT c FROM Contact c where c.mail = :value").setParameter("value", mail).getSingleResult();
+
+			Query q = em.createQuery("SELECT c FROM Contact c where c.email = '" + mail + "'",Contact.class);
+			Contact contact = (Contact) q.getSingleResult();
+			//Contact contact = em.find(Contact.class, mail);
+
+
+
+			nom = contact.getLastName();
+			prenom = contact.getFirstName();
+			mail =  contact.getEmail();
+			street =  contact.getAdress().getStreet();
+			city =  contact.getAdress().getCity();
+			zip = contact.getAdress().getZip();
+			country = contact.getAdress().getCountry();
+			phone_kind = contact.getPhones().iterator().next().getPhoneKind();
+			phone_number = contact.getPhones().iterator().next().getPhoneNumber();
+			res = "<br>Main Information :  " + prenom + " " + nom + " " + mail + "<br>Adress :  " + street + " "
+					+ city + " " + zip + " " + country + "<br>Phone :  " + phone_kind + " " + phone_number
+					+ "<br><br>";
+
+
+
+
+			// 5 : Fermeture transaction 
+			tx.commit();
+
+
+			// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+			em.close();
+
+			// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+			//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+			//JpaUtil.close();	
+			return res;
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+
+		}
+		return null;
+	}
+
+	/*
 	public String updateContact(String mail, String selection, String modif) throws NamingException {
 		DataSource ds = null;
 		Connection cn = null;
@@ -254,154 +301,214 @@ public class ContactDaos {
 			}
 		}
 		return null;
-	}
+	}*/
 
-	public String deleteContact(String mail) throws NamingException {
-		DataSource ds = null;
-		Connection cn = null;
-		PreparedStatement pstmt = null;
+	public String updateContact(String mail, String selection, String modif) throws NamingException {
+		boolean success=false;
 
 		try {
+			EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+			// 2 : Ouverture transaction 
+			EntityTransaction tx =  em.getTransaction();
+			tx.begin();
+			//Contact contact = (Contact) em.createQuery("SELECT c FROM Contact c where c.mail = :value").setParameter("value", mail).getSingleResult();
+
+			Query q = em.createQuery("SELECT c FROM Contact c where c.email = '" + mail + "'",Contact.class);
+			Contact contact = (Contact) q.getSingleResult();
+			Adress adress = contact.getAdress();
+			//Contact contact = em.find(Contact.class, mail);
+			switch(selection) {
+			case "firstname":
+				contact.setFirstName(modif);
+				
+				break;
+			case "lastname":
+				contact.setLastName(modif);
+				break;
+			case "zip":
+				adress.setZip(modif);
+				break;
+			case "city":
+				adress.setCity(modif);
+				break;
+			case "country":
+				adress.setCountry(modif);
+				break;
+			case "street":
+				adress.setStreet(modif);
+				break;
+
+			}
+			em.flush();
+				
+
+
+				// 5 : Fermeture transaction 
+				tx.commit();
+
+
+				// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+				em.close();
+
+				// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+				//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+				//JpaUtil.close();	
+
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+
+			}
+			return null;
+		}
+
+		public String deleteContact(String mail) throws NamingException {
+			DataSource ds = null;
+			Connection cn = null;
+			PreparedStatement pstmt = null;
+
+			try {
+
+				Context ctx = new InitialContext();
+				ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
+				cn = ds.getConnection();
+
+				if (mailPresent(mail)) {
+
+					String requete = "Delete from adress where id_adress = (select id_contact from contact where mail = ?)";
+					pstmt = cn.prepareStatement(requete);
+					// pstmt.setString(1, selection);
+					pstmt.setString(1, mail);
+					pstmt.executeUpdate();
+
+					String requete2 = "Delete from phone_number where id_contact = (select id_contact from contact where mail = ?)";
+					pstmt = cn.prepareStatement(requete2);
+					// pstmt.setString(1, selection);
+					pstmt.setString(1, mail);
+					pstmt.executeUpdate();
+
+					String requete3 = "Delete from contact where mail = ?";
+					pstmt = cn.prepareStatement(requete3);
+					// pstmt.setString(1, selection);
+					pstmt.setString(1, mail);
+					pstmt.executeUpdate();
+					System.out.println("Suppression de " + mail);
+				} else {
+					System.out.println("le mail " + mail + " n'existe pas");
+					return "error le mail est deja present";
+				}
+				return null;
+			} catch (SQLException e) {
+				return "SQLException : " + e.getMessage();
+			} finally {
+				try {
+					if (cn != null)
+						cn.close();
+				} catch (SQLException e) {
+					return "SQLException : " + e.getMessage();
+				}
+			}
+		}
+
+		public String addContactGroup(String mail, String groupName) throws NamingException {
+			DataSource ds = null;
+			Connection cn = null;
+			PreparedStatement pstmt = null;
+
+			try {
+
+				Context ctx = new InitialContext();
+				ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
+				cn = ds.getConnection();
+
+				if (mailPresent(mail)) {
+
+					String requete = " insert into contact_group_int values(null,(select id_group from contact_group where group_name = ?),(select id_contact from contact where mail = ?));";
+					pstmt = cn.prepareStatement(requete);
+					pstmt.setString(1, groupName);
+					pstmt.setString(2, mail);
+					pstmt.executeUpdate();
+				} else {
+					System.out.println("le mail " + mail + " n'existe pas");
+					return "error le mail est deja present";
+				}
+				return null;
+			} catch (SQLException e) {
+				return "SQLException : " + e.getMessage();
+			} finally {
+				try {
+					if (cn != null)
+						cn.close();
+				} catch (SQLException e) {
+					return "SQLException : " + e.getMessage();
+				}
+			}
+		}
+
+		public String deleteContactGroup(String mail, String groupName) throws NamingException {
+			DataSource ds = null;
+			Connection cn = null;
+			PreparedStatement pstmt = null;
+
+			try {
+
+				Context ctx = new InitialContext();
+				ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
+				cn = ds.getConnection();
+
+				if (mailPresent(mail)) {
+
+					String requete = " delete from contact_group_int where id_group = (select id_group from contact_group where group_name = ?) and id_contact = (select id_contact from contact where mail = ?);";
+					pstmt = cn.prepareStatement(requete);
+					pstmt.setString(1, groupName);
+					pstmt.setString(2, mail);
+					pstmt.executeUpdate();
+				} else {
+					System.out.println("le mail " + mail + " n'existe pas");
+					return "error le mail est deja present";
+				}
+				return null;
+			} catch (SQLException e) {
+				return "SQLException : " + e.getMessage();
+			} finally {
+				try {
+					if (cn != null)
+						cn.close();
+				} catch (SQLException e) {
+					return "SQLException : " + e.getMessage();
+				}
+			}
+		}
+
+		public String loginCheck(String mail, String password) {
+			if (mail.equals(password)) {
+				return null;
+			} else {
+				return "error mail et password ne correspondent pas";
+			}
+		}
+
+		public boolean mailPresent(String mail) throws NamingException, SQLException {
+
+			ResultSet rs = null;
+			DataSource ds = null;
+			Connection cn = null;
+			PreparedStatement pstmt = null;
 
 			Context ctx = new InitialContext();
 			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
-			cn = ds.getConnection();
+			cn = (Connection) ds.getConnection();
 
-			if (mailPresent(mail)) {
-
-				String requete = "Delete from adress where id_adress = (select id_contact from contact where mail = ?)";
-				pstmt = cn.prepareStatement(requete);
-				// pstmt.setString(1, selection);
-				pstmt.setString(1, mail);
-				pstmt.executeUpdate();
-
-				String requete2 = "Delete from phone_number where id_contact = (select id_contact from contact where mail = ?)";
-				pstmt = cn.prepareStatement(requete2);
-				// pstmt.setString(1, selection);
-				pstmt.setString(1, mail);
-				pstmt.executeUpdate();
-
-				String requete3 = "Delete from contact where mail = ?";
-				pstmt = cn.prepareStatement(requete3);
-				// pstmt.setString(1, selection);
-				pstmt.setString(1, mail);
-				pstmt.executeUpdate();
-				System.out.println("Suppression de " + mail);
+			String requeteVerif = "select mail from contact where mail = ? ";
+			pstmt = cn.prepareStatement(requeteVerif);
+			pstmt.setString(1, mail);
+			rs = pstmt.executeQuery();
+			if (rs.first()) {
+				return true;
 			} else {
-				System.out.println("le mail " + mail + " n'existe pas");
-				return "error le mail est deja present";
+				return false;
 			}
-			return null;
-		} catch (SQLException e) {
-			return "SQLException : " + e.getMessage();
-		} finally {
-			try {
-				if (cn != null)
-					cn.close();
-			} catch (SQLException e) {
-				return "SQLException : " + e.getMessage();
-			}
+
 		}
 	}
-
-	public String addContactGroup(String mail, String groupName) throws NamingException {
-		DataSource ds = null;
-		Connection cn = null;
-		PreparedStatement pstmt = null;
-
-		try {
-
-			Context ctx = new InitialContext();
-			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
-			cn = ds.getConnection();
-
-			if (mailPresent(mail)) {
-
-				String requete = " insert into contact_group_int values(null,(select id_group from contact_group where group_name = ?),(select id_contact from contact where mail = ?));";
-				pstmt = cn.prepareStatement(requete);
-				pstmt.setString(1, groupName);
-				pstmt.setString(2, mail);
-				pstmt.executeUpdate();
-			} else {
-				System.out.println("le mail " + mail + " n'existe pas");
-				return "error le mail est deja present";
-			}
-			return null;
-		} catch (SQLException e) {
-			return "SQLException : " + e.getMessage();
-		} finally {
-			try {
-				if (cn != null)
-					cn.close();
-			} catch (SQLException e) {
-				return "SQLException : " + e.getMessage();
-			}
-		}
-	}
-
-	public String deleteContactGroup(String mail, String groupName) throws NamingException {
-		DataSource ds = null;
-		Connection cn = null;
-		PreparedStatement pstmt = null;
-
-		try {
-
-			Context ctx = new InitialContext();
-			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
-			cn = ds.getConnection();
-
-			if (mailPresent(mail)) {
-
-				String requete = " delete from contact_group_int where id_group = (select id_group from contact_group where group_name = ?) and id_contact = (select id_contact from contact where mail = ?);";
-				pstmt = cn.prepareStatement(requete);
-				pstmt.setString(1, groupName);
-				pstmt.setString(2, mail);
-				pstmt.executeUpdate();
-			} else {
-				System.out.println("le mail " + mail + " n'existe pas");
-				return "error le mail est deja present";
-			}
-			return null;
-		} catch (SQLException e) {
-			return "SQLException : " + e.getMessage();
-		} finally {
-			try {
-				if (cn != null)
-					cn.close();
-			} catch (SQLException e) {
-				return "SQLException : " + e.getMessage();
-			}
-		}
-	}
-
-	public String loginCheck(String mail, String password) {
-		if (mail.equals(password)) {
-			return null;
-		} else {
-			return "error mail et password ne correspondent pas";
-		}
-	}
-
-	public boolean mailPresent(String mail) throws NamingException, SQLException {
-
-		ResultSet rs = null;
-		DataSource ds = null;
-		Connection cn = null;
-		PreparedStatement pstmt = null;
-
-		Context ctx = new InitialContext();
-		ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
-		cn = (Connection) ds.getConnection();
-
-		String requeteVerif = "select mail from contact where mail = ? ";
-		pstmt = cn.prepareStatement(requeteVerif);
-		pstmt.setString(1, mail);
-		rs = pstmt.executeQuery();
-		if (rs.first()) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
-}

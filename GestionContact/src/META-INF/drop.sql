@@ -5,10 +5,10 @@
 -- -----------------------------------------------------
 -- Schema JPA
 -- -----------------------------------------------------
-DROP SCHEMA IF EXISTS `JPA` ;
+--DROP SCHEMA IF EXISTS `JPA` ;
 
 -- -----------------------------------------------------
 -- Schema JPA
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `JPA` DEFAULT CHARACTER SET utf8 ;
+--CREATE SCHEMA IF NOT EXISTS `JPA` DEFAULT CHARACTER SET utf8 ;
 USE `JPA` ;
