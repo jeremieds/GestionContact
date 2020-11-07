@@ -1,0 +1,22 @@
+@charset "ISO-8859-1";
+
+header{
+	background: linear-gradient(to bottom, #cccccc 0%, #ffffff 100%);
+}
+
+.no_top{
+	margin-top : 20;
+	padding-top : 20;
+}
+
+.btn_1{
+	margin-top: 20px;
+}
+
+.form-control{
+	margin-top: 20px;
+}
+
+h3, .txt-form{
+	padding-top: 20px;
+}

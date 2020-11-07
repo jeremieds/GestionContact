@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+
+<!DOCTYPE struts-config PUBLIC 
+          "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN" 
+          "http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+
+	<form-beans>
+	
+			<form-bean name="AddContactValidationForm"
+			type="org.lip6.struts.actionForm.AddContactValidationForm" />
+			
+			<form-bean name="UpdateContactValidationForm"
+			type="org.lip6.struts.actionForm.UpdateContactValidationForm" />
+			
+			<form-bean name="DeleteContactValidationForm"
+			type="org.lip6.struts.actionForm.DeleteContactValidationForm" />
+			
+			<form-bean name="ReadContactValidationForm"
+			type="org.lip6.struts.actionForm.ReadContactValidationForm" />
+			
+			<form-bean name="LoginValidationForm"
+			type="org.lip6.struts.actionForm.LoginValidationForm" />
+			
+			<form-bean name="CreateGroupValidationForm"
+			type="org.lip6.struts.actionForm.CreateGroupValidationForm" />
+			
+			<form-bean name="DeleteGroupValidationForm"
+			type="org.lip6.struts.actionForm.DeleteGroupValidationForm" />
+			
+			<form-bean name="UpdateGroupValidationForm"
+			type="org.lip6.struts.actionForm.UpdateGroupValidationForm" />
+			
+			<form-bean name="readGroupValidationForm"
+			type="org.lip6.struts.actionForm.ReadGroupValidationForm" />
+			
+			<form-bean name="AddContactGroupValidationForm"
+			type="org.lip6.struts.actionForm.AddContactGroupValidationForm" />
+			
+			
+			<form-bean name="DeleteContactGroupValidationForm"
+			type="org.lip6.struts.actionForm.DeleteContactGroupValidationForm" />
+			
+			
+
+	</form-beans>
+
+	<action-mappings>
+
+		<action path="/ContactCreation"
+			forward="/CreateContact.jsp" />
+			
+		<action path="/ContactUpdate"
+			forward="/UpdateContact.jsp" />
+			
+		<action path="/ContactDelete"
+			forward="/DeleteContact.jsp" />
+		
+		<action path="/ContactRead"
+			forward="/ReadContact.jsp" />
+			
+		<action path="/Login"
+			forward="/Login.jsp" />
+		
+		<action path="/MenuContact"
+			forward="/MenuContact.jsp" />
+			
+		<action path="/MenuGroup"
+			forward="/MenuGroup.jsp" />
+			
+		<action path="/GroupCreation"
+			forward="/CreateGroup.jsp" />
+			
+		<action path="/GroupDelete"
+			forward="/DeleteGroup.jsp" />
+			
+		<action path="/GroupUpdate"
+			forward="/UpdateGroup.jsp" />
+			
+		<action path="/GroupRead"
+			forward="/ReadGroup.jsp" />
+			
+		<action path="/MenuGroupView"
+			forward="/MenuGroupView.jsp" />
+			
+		<action path="/ViewContactGroup"
+			forward="/ViewContactGroup.jsp" />
+			
+		<action path="/AddContactGroup"
+			forward="/AddContactGroup.jsp" />
+			
+			<action path="/DeleteContactGroup"
+			forward="/DeleteContactGroup.jsp" />
+	
+		<action path="/AddContact"
+			type="org.lip6.struts.servletAction.AddContactAction"
+			name="AddContactValidationForm" scope="request"
+			input="/CreateContact.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/AddContactGroup"
+			type="org.lip6.struts.servletAction.AddContactGroupAction"
+			name="AddContactGroupValidationForm" scope="request"
+			input="/AddContactGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		
+		<action path="/UpdateContact"
+			type="org.lip6.struts.servletAction.UpdateContactAction"
+			name="UpdateContactValidationForm" scope="request"
+			input="/UpdateContact.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/DeleteContact"
+			type="org.lip6.struts.servletAction.DeleteContactAction"
+			name="DeleteContactValidationForm" scope="request"
+			input="/DeleteContact.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/ReadContact"
+			type="org.lip6.struts.servletAction.ReadContactAction"
+			name="ReadContactValidationForm" scope="request"
+			input="/ReadContact.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/Login"
+			type="org.lip6.struts.servletAction.LoginAction"
+			name="LoginValidationForm" scope="request"
+			input="/index.jsp">
+			<forward name="success" path="/Menu.jsp" />
+			<forward name="error" path="/index.jsp" />
+		</action>
+		
+		<action path="/CreateGroup"
+			type="org.lip6.struts.servletAction.CreateGroupAction"
+			name="CreateGroupValidationForm" scope="request"
+			input="/CreateGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>	
+
+		<action path="/DeleteGroup"
+			type="org.lip6.struts.servletAction.DeleteGroupAction"
+			name="DeleteGroupValidationForm" scope="request"
+			input="/DeleteGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/UpdateGroup"
+			type="org.lip6.struts.servletAction.UpdateGroupAction"
+			name="UpdateGroupValidationForm" scope="request"
+			input="/UpdateGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/MenuGroupView"
+			type="org.lip6.struts.servletAction.GroupViewAction"
+			name="GroupViewValidationForm" scope="request"
+			input="/MenuGroupView.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="MenuGroupView" path="/MenuGroupView.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+			<action path="/ViewContactGroup"
+			type="org.lip6.struts.servletAction.ViewContactGroupAction"
+			input="/ViewContactGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="ViewContactGroup" path="/ViewContactGroup.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+		<action path="/DeleteContactGroup"
+			type="org.lip6.struts.servletAction.DeleteContactGroupAction"
+			name="DeleteContactGroupValidationForm" scope="request"
+			input="/DeleteContactGroup.jsp">
+			<forward name="success" path="/success.jsp" />
+			<forward name="error" path="/error.jsp" />
+		</action>
+		
+
+
+	</action-mappings>
+
+	<!-- ========== Ressources de definitions de messages =========================== -->
+
+	<message-resources parameter="Resources" />
+
+</struts-config> 
