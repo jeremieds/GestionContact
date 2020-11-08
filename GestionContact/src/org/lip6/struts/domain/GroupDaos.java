@@ -7,16 +7,62 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.naming.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Session;
+
+import com.lip6.entities.Groups;
+import com.lip6.util.JpaUtil;
 
 public class GroupDaos {
 	public GroupDaos() {
 
 	}
-
+	
 	public String createGroup(String groupName) throws NamingException {
+		//Avant l'utilisation de classe JpaUtil	
+		//EntityManagerFactory emf=Persistence.createEntityManagerFactory("projetJPA");
+		
+		//1: obtenir une connexion et un EntityManager, en passant par la classe JpaUtil
+		
+	    boolean success=false;
+
+		try {
+	    EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+		// 2 : Ouverture transaction 
+		EntityTransaction tx =  em.getTransaction();
+		tx.begin();
+		
+		// 3 : Instanciation Objet(s) m�tier (s)
+		Groups groups = new Groups(groupName);
+		
+		// 4 : Persistance Objet/Relationnel : cr�ation d'un enregistrement en base
+		 
+		em.persist(groups);
+		
+		// 5 : Fermeture transaction 
+		tx.commit();
+		 
+		// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+		em.close();
+		
+		// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+		//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+		//JpaUtil.close();	
+		
+		success=true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		return null;
+	}
+
+	/*public String createGroup(String groupName) throws NamingException {
 
 		DataSource ds = null;
 		Connection cn = null;
@@ -54,7 +100,7 @@ public class GroupDaos {
 			}
 		}
 
-	}
+	}*/
 	
 	public String deleteGroup(String groupName) throws NamingException {
 
