@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import javax.naming.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Session;
@@ -104,41 +105,60 @@ public class GroupDaos {
 	
 	public String deleteGroup(String groupName) throws NamingException {
 
-		DataSource ds = null;
-		Connection cn = null;
-		PreparedStatement pstmt = null;
+		//Avant l'utilisation de classe JpaUtil	
+		//EntityManagerFactory emf=Persistence.createEntityManagerFactory("projetJPA");
+		
+		//1: obtenir une connexion et un EntityManager, en passant par la classe JpaUtil
+		
+	    boolean success=false;
 
 		try {
-			Context ctx = new InitialContext();
-			ds = (DataSource) ctx.lookup("java:comp/env/jdbc/ContactBD");
-			cn = (Connection) ds.getConnection();
+	    EntityManager em=JpaUtil.getEmf().createEntityManager();
 
-			if (groupNamePresent(groupName)) {
+		// 2 : Ouverture transaction 
+		EntityTransaction tx =  em.getTransaction();
+		tx.begin();
+		
+		TypedQuery<Groups> query =
+			  	em.createQuery("SELECT g FROM Groups g WHERE g.groupName = '"+ groupName +"'", Groups.class);
+			    Groups results = query.getSingleResult();
+		
+		// 3 : Instanciation Objet(s) m�tier (s)
+		Groups group = em.find(Groups.class, results.getIdGroup());
+		//contact.setAdress(null);
+		//contact.setEmail(null);
+		//contact.setPhones(null);
+		//contact.setContactGroups(null);
+		
+		// 4 : Persistance Objet/Relationnel : cr�ation d'un enregistrement en base
+		 
+		//em.persist(contact);
 
-				String requete = "delete from contact_group where group_name = ?";
-				pstmt = cn.prepareStatement(requete);
-				pstmt.setString(1, groupName);
-				pstmt.executeUpdate();
 
-				System.out.println("suppression du groupe " + groupName);
-
-			} else {
-				System.out.println("Le groupe " + groupName + " n'existe pas");
-				return "error";
-			}
-
-			return null;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return "SQLException : " + e.getMessage();
-		} finally {
-			try {
-				if (cn != null)
-					cn.close();
-			} catch (SQLException e) {
-				return "SQLException : " + e.getMessage();
-			}
+		//ici l'objet est dans un �tat manag� par l'EM, pas besoin d'un nouveau persist
+		//contact.setLastName("Blanquito");
+		em.remove(group);
+		
+		// 5 : Fermeture transaction 
+		tx.commit();
+		
+		//ici l'objet est dans un �tat d�tach� de l'EM, la modif ne sera pas commit�e
+		//contact.setLastName("Blanchard");
+		 
+		// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+		em.close();
+		
+		// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+		//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+		//JpaUtil.close();	
+		
+		success=true;
 		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		return null;
 	}
 	
 	public String updateGroup(String groupName, String newGroupName) throws NamingException {

@@ -29,7 +29,7 @@
 
 								<div class="col-12 col-sm-6 col-md-4 col-lg-3">
 									<input type="text" name="mail" class="form-control"
-										placeholder="Mail">
+										placeholder="LastName">
 								</div>
 
 								<div class="col-12 col-sm-6 col-md-4 col-lg-3">
