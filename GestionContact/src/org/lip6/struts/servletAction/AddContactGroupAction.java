@@ -21,7 +21,7 @@ public class AddContactGroupAction extends Action {
 		final String mail = lForm.getMail();
 		final ContactDaos lDAOContact = new ContactDaos();
 		final String groupName = (String) pRequest.getSession().getAttribute("groupe");
-		final String lError = lDAOContact.addContactGroup(mail,groupName);
+		final String lError = lDAOContact.addContactGroup(mail, groupName);
 
 		if (lError == null) {
 
