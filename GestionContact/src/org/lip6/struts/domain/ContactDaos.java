@@ -8,6 +8,7 @@ import javax.naming.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 
 import com.lip6.entities.Adress;
@@ -362,8 +363,69 @@ public class ContactDaos {
 			}
 			return null;
 		}
+	
 
-		public String deleteContact(String mail) throws NamingException {
+	public String deleteContact(String lastName) throws NamingException {
+		
+		//Avant l'utilisation de classe JpaUtil	
+		//EntityManagerFactory emf=Persistence.createEntityManagerFactory("projetJPA");
+		
+		//1: obtenir une connexion et un EntityManager, en passant par la classe JpaUtil
+		
+	    boolean success=false;
+
+		try {
+	    EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+		// 2 : Ouverture transaction 
+		EntityTransaction tx =  em.getTransaction();
+		tx.begin();
+		
+		TypedQuery<Contact> query =
+			  	em.createQuery("SELECT c FROM Contact c WHERE c.lastName = '"+ lastName +"'", Contact.class);
+			    Contact results = query.getSingleResult();
+		
+		// 3 : Instanciation Objet(s) m�tier (s)
+		Contact contact = em.find(Contact.class, results.getId());
+		//contact.setAdress(null);
+		//contact.setEmail(null);
+		//contact.setPhones(null);
+		//contact.setContactGroups(null);
+		
+		// 4 : Persistance Objet/Relationnel : cr�ation d'un enregistrement en base
+		 
+		//em.persist(contact);
+
+
+		//ici l'objet est dans un �tat manag� par l'EM, pas besoin d'un nouveau persist
+		//contact.setLastName("Blanquito");
+		em.remove(contact);
+		em.getTransaction().commit();
+		
+		// 5 : Fermeture transaction 
+		tx.commit();
+		
+		//ici l'objet est dans un �tat d�tach� de l'EM, la modif ne sera pas commit�e
+		//contact.setLastName("Blanchard");
+		 
+		// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+		em.close();
+		
+		// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+		//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+		//JpaUtil.close();	
+		
+		success=true;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		return null;		
+	}
+
+	
+		/*public String deleteContact(String mail) throws NamingException {
 			DataSource ds = null;
 			Connection cn = null;
 			PreparedStatement pstmt = null;
@@ -479,7 +541,7 @@ public class ContactDaos {
 					return "SQLException : " + e.getMessage();
 				}
 			}
-		}
+		}*/
 
 		public String loginCheck(String mail, String password) {
 			if (mail.equals(password)) {
