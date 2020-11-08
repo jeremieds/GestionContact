@@ -472,7 +472,7 @@ public class ContactDaos {
 				}
 			}
 		}
-
+		*/
 		public String addContactGroup(String mail, String groupName) throws NamingException {
 			DataSource ds = null;
 			Connection cn = null;
@@ -541,7 +541,7 @@ public class ContactDaos {
 					return "SQLException : " + e.getMessage();
 				}
 			}
-		}*/
+		}
 
 		public String loginCheck(String mail, String password) {
 			if (mail.equals(password)) {
