@@ -400,7 +400,7 @@ public class ContactDaos {
 		//ici l'objet est dans un �tat manag� par l'EM, pas besoin d'un nouveau persist
 		//contact.setLastName("Blanquito");
 		em.remove(contact);
-		em.getTransaction().commit();
+		//em.getTransaction().commit();
 		
 		// 5 : Fermeture transaction 
 		tx.commit();
