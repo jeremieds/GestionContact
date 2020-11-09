@@ -59,6 +59,12 @@ public class Groups implements Serializable {
 	
 
 
+	public long getIdGroup() {
+		return idGroup;
+	}
+
+
+
 	public String getGroupName() {
 		return groupName;
 	}
