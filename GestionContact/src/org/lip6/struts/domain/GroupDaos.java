@@ -5,15 +5,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.*;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.sql.DataSource;
 
 import org.apache.catalina.Session;
 
+import com.lip6.entities.Adress;
+import com.lip6.entities.Contact;
 import com.lip6.entities.Groups;
 import com.lip6.util.JpaUtil;
 
@@ -125,6 +129,7 @@ public class GroupDaos {
 		
 		// 3 : Instanciation Objet(s) m�tier (s)
 		Groups group = em.find(Groups.class, results.getIdGroup());
+	
 		//contact.setAdress(null);
 		//contact.setEmail(null);
 		//contact.setPhones(null);
@@ -160,7 +165,7 @@ public class GroupDaos {
 		}
 		return null;
 	}
-	
+	/*
 	public String updateGroup(String groupName, String newGroupName) throws NamingException {
 
 		DataSource ds = null;
@@ -200,8 +205,52 @@ public class GroupDaos {
 			}
 		}
 
+	}*/
+
+	public String updateGroup(String groupName, String newGroupName) throws NamingException {
+
+
+	try {
+		EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+		// 2 : Ouverture transaction 
+		EntityTransaction tx =  em.getTransaction();
+		tx.begin();
+		//Contact contact = (Contact) em.createQuery("SELECT c FROM Contact c where c.mail = :value").setParameter("value", mail).getSingleResult();
+
+		TypedQuery<Groups> query =
+			  	em.createQuery("SELECT g FROM Groups g WHERE g.groupName = '"+ groupName +"'", Groups.class);
+			    Groups results = query.getSingleResult();	
+		//Contact contact = em.find(Contact.class, mail);
+		
+		results.setGroupName(newGroupName);
+		
+		em.flush();
+			
+
+
+			// 5 : Fermeture transaction 
+			tx.commit();
+
+
+			// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+			em.close();
+
+			// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+			//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+			//JpaUtil.close();	
+
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+
+
+		}
+		return null;
+		
 	}
-	
+	/*
 	public ArrayList<String> allGroupsNames() throws NamingException {
 		ResultSet rs = null;
 		DataSource ds = null;
@@ -244,6 +293,53 @@ public class GroupDaos {
 			}
 		}
 	}
+	*/
+	
+	public ArrayList<String> allGroupsNames() throws NamingException {
+		ArrayList<String> listeGroups = new ArrayList<String>();
+		List<Groups> listeGroups2 = new ArrayList<Groups>();
+
+		try {
+			EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+			// 2 : Ouverture transaction 
+			EntityTransaction tx =  em.getTransaction();
+			tx.begin();
+			//Contact contact = (Contact) em.createQuery("SELECT c FROM Contact c where c.mail = :value").setParameter("value", mail).getSingleResult();
+
+			TypedQuery<Groups> query =
+				  	em.createQuery("SELECT g FROM Groups g", Groups.class);
+					listeGroups2 = query.getResultList();
+			//Contact contact = em.find(Contact.class, mail);
+			
+					for (Groups g : listeGroups2) {
+					      System.out.println(g.getGroupName());
+							listeGroups.add(g.getGroupName());
+					  }
+		
+
+				// 5 : Fermeture transaction 
+				tx.commit();
+
+
+				// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+				em.close();
+
+				// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+				//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+				//JpaUtil.close();	
+				return listeGroups;
+
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				return listeGroups;
+
+
+			}
+			
+	}
+	
 	
 	public ArrayList<String> viewContactGroup(String groupName) throws NamingException {
 		ResultSet rs = null;

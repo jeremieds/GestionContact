@@ -31,7 +31,13 @@ public class Groups implements Serializable {
 	
 	
  
-
+	public void addContact(Contact c) {
+		this.contacts.add(c);
+	}
+	
+	public void removeContact(Contact c) {
+		this.contacts.remove(c);
+	}
 
 
 	public Set<Contact> getContacts() {

@@ -150,6 +150,7 @@ public class ContactDaos {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return "error";
 
 		}
 		return null;
@@ -260,9 +261,10 @@ public class ContactDaos {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return "error";
+
 
 		}
-		return null;
 	}
 
 	/*
@@ -359,6 +361,8 @@ public class ContactDaos {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+				return "error";
+
 
 			}
 			return null;
@@ -488,7 +492,7 @@ public class ContactDaos {
 			}
 			return null;
 		}
-		*/
+		
 		public String addContactGroup(String mail, String groupName) throws NamingException {
 			DataSource ds = null;
 			Connection cn = null;
@@ -523,6 +527,54 @@ public class ContactDaos {
 				}
 			}
 		}
+		*/
+		
+	public String addContactGroup(String mail, String groupName) throws NamingException {
+
+		try {
+			EntityManager em=JpaUtil.getEmf().createEntityManager();
+
+			// 2 : Ouverture transaction 
+			EntityTransaction tx =  em.getTransaction();
+			tx.begin();
+			
+			TypedQuery<Contact> query =
+				  	em.createQuery("SELECT c FROM Contact c WHERE c.email = '"+ mail +"'", Contact.class);
+				    Contact contact = query.getSingleResult();
+				    
+			TypedQuery<Groups> query2 =
+						  	em.createQuery("SELECT g FROM Groups g WHERE g.groupName = '"+ groupName +"'", Groups.class);
+						    Groups groups = query2.getSingleResult();	
+
+			
+			groups.addContact(contact);
+					
+
+
+
+			// 4 : Persistance Objet/Relationnel : cr�ation d'un enregistrement en base
+
+			em.flush();
+
+
+			// 5 : Fermeture transaction 
+			tx.commit();
+
+
+			// 6 : Fermeture de l'EntityManager et de unit� de travail JPA 
+			em.close();
+
+			// 7: Attention important, cette action ne doit s'executer qu'une seule fois et non pas à chaque instantiation du ContactDAO
+			//Donc, pense bien à ce qu'elle soit la dernière action de votre application
+			//JpaUtil.close();	
+			return null;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return "error";
+
+		}
+}
 
 		public String deleteContactGroup(String mail, String groupName) throws NamingException {
 			DataSource ds = null;
